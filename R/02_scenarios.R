@@ -14,7 +14,7 @@
 #   model forecasts the Canadian variables conditional on those paths.
 # =============================================================================
 
-library(vars)      # load first: it attaches MASS, whose select() would hide dplyr's
+library(vars)      # attaches MASS, which has its own select(); we call dplyr::select() explicitly
 library(dplyr)
 library(readr)
 library(tidyr)
@@ -131,15 +131,15 @@ labels <- c(gdp = "Real GDP growth (% q/q ann.)", unemp = "Unemployment rate (%)
 
 history <- macro |>
   filter(quarter >= as.Date("2021-01-01")) |>
-  select(quarter, all_of(endog_vars)) |>
+  dplyr::select(quarter, all_of(endog_vars)) |>
   pivot_longer(-quarter) |>
   mutate(scenario = "history")
 
 # Connect each scenario line to the last actual quarter
-last_actual <- history |> filter(quarter == max(quarter)) |> select(-scenario)
+last_actual <- history |> filter(quarter == max(quarter)) |> dplyr::select(-scenario)
 
 paths <- results |>
-  select(scenario, quarter, all_of(endog_vars)) |>
+  dplyr::select(scenario, quarter, all_of(endog_vars)) |>
   pivot_longer(-c(scenario, quarter)) |>
   bind_rows(tidyr::crossing(last_actual, scenario = names(scenarios)))
 
