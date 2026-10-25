@@ -5,7 +5,7 @@ Cleaning happens in `R/01_data.R`.
 
 | File | Source | Series / table | Selection | Downloaded |
 | --- | --- | --- | --- | --- |
-| boc_rate.csv | Bank of Canada Valet | V39079 | 2026-10-23 |
+| boc_rate.csv | Bank of Canada Valet | V39079 | Daily target for the overnight rate, full history (starts 2009-04-21) | 2026-10-23 |
 | wti.csv | FRED | DCOILWTICO | Quarterly, average | 2026-10-23 |
 | us_gdp.csv | FRED | GDPC1 | Quarterly | 2026-10-23 |
 | can_gdp.csv | Statistics Canada | 36-10-0104-01 | Canada; chained 2017 $; SAAR; GDP at market prices | 2026-10-23 |

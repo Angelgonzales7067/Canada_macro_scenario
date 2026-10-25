@@ -1,0 +1,212 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{../output/}{./}}   % ./ lets it compile in Overleaf with scenarios.png uploaded alongside
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\title{Canadian Macroeconomic Scenarios:\\ Oil Prices and US Growth, 2026Q3--2028Q3}
+\author{Angel Gonzales}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent This note builds three scenarios for the Canadian economy over 2026Q3--2028Q3 and maps
+them into paths for real GDP, unemployment, CPI inflation, the Bank of Canada policy rate and new
+house prices. The scenarios differ in two external drivers that Canada does not control: the WTI oil
+price and US real GDP growth. A vector autoregression (VAR) with these drivers as exogenous variables,
+estimated on 2009Q3--2026Q2 data, translates each driver path into Canadian outcomes. In the downside
+scenario, a US slowdown with oil falling to \$50 calibrated to the 2001 US recession, Canadian GDP
+contracts for three consecutive quarters, unemployment peaks near 7.9\%, and the policy rate falls close
+to its effective lower bound by mid-2028. All code and data are available at
+\url{https://github.com/Angelgonzales7067/Canada_macro_scenario}.
+\end{abstract}
+
+% -----------------------------------------------------------------------------
+\section{Methodology}
+
+\subsection{Approach}
+
+The exercise follows the workflow commonly used for bank scenario analysis and stress testing:
+(1) write a short narrative for each scenario; (2) translate it into paths for a few external drivers;
+(3) use a model estimated on history to map the drivers into domestic variables; and (4) apply
+judgment where the model is a poor guide.
+
+\subsection{Data}
+
+The sample is quarterly, 2009Q3 to 2026Q2 (68 quarters). It starts with the first full quarter of the
+Bank of Canada's daily policy-rate series (V39079, available from April 21, 2009) and ends with the
+latest quarter for which Canadian and US GDP are published. Monthly series are averaged to quarters
+before transformation. Growth rates are computed as annualized log differences, $400\,\Delta\ln x_t$;
+the oil price enters as the quarterly log change, $100\,\Delta\ln P_t$.
+
+\begin{table}[htbp]
+\centering
+\caption{Variables, transformations and sources}
+\small
+\begin{tabular}{llll}
+\toprule
+Variable & Role & Form in model & Source \\
+\midrule
+WTI oil price           & Exogenous driver & $100\,\Delta\ln$, quarterly       & FRED, DCOILWTICO \\
+US real GDP             & Exogenous driver & $400\,\Delta\ln$, annualized       & FRED, GDPC1 \\
+Canada real GDP         & Endogenous       & $400\,\Delta\ln$, annualized       & StatCan 36-10-0104-01 \\
+Unemployment rate       & Endogenous       & Level, \%                          & StatCan 14-10-0287-01 \\
+CPI, all items (SA)     & Endogenous       & $400\,\Delta\ln$, annualized       & StatCan 18-10-0006-01 \\
+Policy rate             & Endogenous       & Level, \%                          & Bank of Canada, V39079 \\
+New Housing Price Index & Endogenous       & $400\,\Delta\ln$, annualized       & StatCan 18-10-0205-01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Model}
+
+The model is a VAR with exogenous variables (VARX):
+\begin{equation}
+  y_t = c + A_1\, y_{t-1} + B_0\, x_t + B_1\, x_{t-1} + \Gamma\, d_t + u_t ,
+\end{equation}
+where $y_t$ contains the five Canadian variables, $x_t$ contains oil-price growth and US GDP growth,
+and $d_t$ contains dummy variables for 2020Q2 and 2020Q3 that absorb the COVID-19 collapse and rebound.
+Treating oil and US GDP as exogenous reflects the small-open-economy assumption: Canadian conditions do
+not move world oil prices or US output within the quarter. It also makes scenario analysis direct,
+because a scenario is simply a chosen path for $x_t$.
+
+The lag length is one quarter due to lack of observations. The model is estimated by OLS equation by equation using
+the R package \texttt{vars}.
+
+\subsection{Scenario forecasts and judgment}
+
+For each scenario, the oil and US GDP paths are fed into the estimated model and the Canadian variables
+are forecast nine quarters ahead, conditional on those paths. The 2026Q3 oil price is set to its actual
+average (\$87.12) in every scenario. For every scenario, the policy rate was imposed to be greater than or equal to 0.25\%
+
+% -----------------------------------------------------------------------------
+\section{Scenarios and historical calibration}
+
+Each scenario's driver paths are sized against historical episodes in the same data (Table~\ref{tab:episodes}),
+so that magnitudes reflect what has actually happened rather than arbitrary choices.
+
+\begin{table}[htbp]
+\centering
+\caption{Scenario assumptions, 2026Q3--2028Q3}
+\label{tab:scenarios}
+\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.8cm}>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}p{5.6cm}}
+\toprule
+Scenario & WTI path (US\$/bbl) & US real GDP & Historical calibration \\
+\midrule
+Baseline & Eases from \$87 to \$75 by 2027Q4, then flat & 2.0\% & US growth near potential and just below its 2010--19 average (2.4\% \\[0.3em]
+Upside   & Drifts gently to \$70 by 2028Q3 & 3.0\% & 2017--19 expansion: US growth averaged about 2.8\%, WTI traded between \$48 and \$70 \\[0.3em]
+Downside & Falls to \$68 in 2026Q4 and \$50 by 2027Q1, then flat ($-43\%$) & 0.5\% & 2001 US recession: US growth averaged 1.1\% over 2000Q3--2002Q4, WTI fell 36\%; the oil decline is similar to 1998 ($-44\%$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Historical episodes used for calibration (quarterly averages)}
+\label{tab:episodes}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Episode & WTI peak to trough & US growth & Canada GDP level & Canada unemp. \\
+ & & (avg.) & (peak to trough) & (change) \\
+\midrule
+1998 Asia crisis      & \$23 $\to$ \$13 ($-44\%$)  & 4.4\%    & No decline   & No increase \\
+2001 US recession     & \$32 $\to$ \$21 ($-36\%$)  & 1.1\%    & No decline   & $+1.0$ pt \\
+2008--09 GFC          & \$124 $\to$ \$43 ($-65\%$) & $-0.3\%$ & $-4.4\%$     & $+2.5$ pts \\
+2014--16 oil bust     & \$103 $\to$ \$33 ($-68\%$) & 2.7\%    & $-0.5\%$     & Flat (national) \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+\footnotesize Source: author's calculations from FRED and Statistics Canada data in the repository.
+\end{table}
+
+The downside is a plausible, moderate scenario rather than a severe stress. A severe scenario for
+stress-testing purposes would be calibrated to 2008--09: oil down roughly 60\% and a US contraction.
+
+% -----------------------------------------------------------------------------
+\section{Results}
+
+Table 4 reports 2027 averages and the gap from the baseline; Figure 1
+shows the full quarterly paths.
+
+\begin{table}[htbp]
+\centering
+\caption{2027 averages by scenario (growth rates annualized, \%)}
+\label{tab:results}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+ & WTI (\$) & US GDP & Canada GDP & Unemp. & CPI & Policy rate & House prices \\
+\midrule
+Baseline              & 78.4  & 2.0  & 1.44  & 7.11 & 1.29 & 1.80 & 0.12 \\
+Upside                & 79.6  & 3.0  & 1.80  & 6.96 & 1.29 & 1.96 & $-0.05$ \\
+Downside              & 50.0  & 0.5  & 0.15  & 7.58 & 0.42 & 1.39 & $-0.74$ \\
+\midrule
+Upside $-$ baseline   & 1.3   & 1.0  & 0.37  & $-0.15$ & 0.00 & 0.16 & $-0.17$ \\
+Downside $-$ baseline & $-28.4$ & $-1.5$ & $-1.29$ & 0.47 & $-0.87$ & $-0.41$ & $-0.86$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{scenarios.png}
+\caption{Canadian macro paths under the three scenarios. History since 2021 in grey.}
+\label{fig:paths}
+\end{figure}
+
+\textbf{Downside.} Canadian real GDP contracts for three consecutive quarters (2026Q4--2027Q2), with a
+trough of $-1.0\%$ annualized in 2027Q1, and the level falls about 0.4\% from its peak. This is a mild
+technical recession, similar in severity to Canada's experience in 2001. Unemployment rises steadily to a
+peak of about 7.9\% in 2028Q2, 1.2 points above its 2026Q2 level of 6.7\%. Inflation dips below zero in
+2027Q1 as lower oil prices pass through, and the policy rate is cut to about 0.3\% by 2028Q3, close
+to its effective lower bound. New house prices decline through 2027.
+
+\textbf{Upside.} Stronger US demand lifts Canadian GDP growth by about 0.4 points relative to the baseline
+in 2027, and unemployment is slightly lower. Because the upside oil path declines more slowly than the
+baseline path, average 2027 oil prices are similar in both, so the upside works almost entirely through
+the US demand channel.
+
+\textbf{Supply versus demand shocks.} During development, an alternative downside with oil rising to
+\$110 (a supply shock) and US growth of 1.5\% was also run. It \emph{raised} Canadian GDP growth relative
+to the baseline (by about 0.4 points in 2027) and pushed CPI inflation up by about 0.7 points, because
+Canada is a net oil exporter and higher prices improve its terms of trade. For Canada, the more damaging
+combination is a demand shock in which oil prices fall \emph{and} US growth weakens, which is why the
+final downside takes that form. History supports this: in 2014--16 oil collapsed while the US kept
+growing, and Canadian unemployment did not rise nationally, whereas in 2001 and 2008--09 US weakness
+was accompanied by rising Canadian unemployment.
+
+% -----------------------------------------------------------------------------
+\section{Limitations}
+
+\begin{itemize}
+  \item \textbf{Linearity.} The VAR captures average historical relationships. It likely understates
+        responses to large shocks; a 2008-sized shock would probably produce a milder outcome than the
+        $-4.4\%$ GDP decline Canada actually experienced.
+  \item \textbf{Short sample and imprecise estimates.} The policy-rate series limits the sample to
+        68 quarters. In the GDP equation, only contemporaneous US growth is statistically significant
+        at the 5\% level; oil coefficients are positive but imprecise.
+  \item \textbf{Mean reversion.} Forecasts drift toward sample averages. Part of the rise in
+        unemployment in every scenario, including the baseline, reflects reversion toward the
+        2009--2026 average of about 7\%.
+  \item \textbf{Missing channels.} The exchange rate, Canadian fiscal policy, and feedback from Canada
+        to the world are not modelled. Forecast uncertainty bands are not reported.
+  \item \textbf{Judgment.} The policy-rate floor is imposed by hand, and scenario probabilities are not
+        assigned.
+\end{itemize}
+
+\end{document}
