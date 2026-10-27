@@ -21,26 +21,15 @@
 \maketitle
 
 \begin{abstract}
-\noindent This note builds three scenarios for the Canadian economy over 2026Q3--2028Q3 and maps
-them into paths for real GDP, unemployment, CPI inflation, the Bank of Canada policy rate and new
-house prices. The scenarios differ in two external drivers that Canada does not control: the WTI oil
-price and US real GDP growth. A vector autoregression (VAR) with these drivers as exogenous variables,
-estimated on 2009Q3--2026Q2 data, translates each driver path into Canadian outcomes. In the downside
-scenario, a US slowdown with oil falling to \$50 calibrated to the 2001 US recession, Canadian GDP
+\noindent This report builds three scenarios for the Canadian economy over 2026Q3--2028Q3 and computes them into forecasts for real GDP, unemployment, CPI inflation, the Bank of Canada policy rate and new house prices. Using two exogenous variables that Canada does not control: the WTI oil price and US real GDP growth, 
+I estimate a VAR, calibrated over the period 2009Q3 to 2026Q2, and forecast key Canadian macroeconomic variables using the paths of the exogenous variables. In the downside
+scenario, a US slowdown with oil falling to \$50, calibrated to the 2001 US recession, Canadian GDP
 contracts for three consecutive quarters, unemployment peaks near 7.9\%, and the policy rate falls close
-to its effective lower bound by mid-2028. All code and data are available at
-\url{https://github.com/Angelgonzales7067/Canada_macro_scenario}.
+to 0.25\% by mid-2028. All code and data are available at \url{https://github.com/Angelgonzales7067/Canada_macro_scenario}.
 \end{abstract}
 
 % -----------------------------------------------------------------------------
 \section{Methodology}
-
-\subsection{Approach}
-
-The exercise follows the workflow commonly used for bank scenario analysis and stress testing:
-(1) write a short narrative for each scenario; (2) translate it into paths for a few external drivers;
-(3) use a model estimated on history to map the drivers into domestic variables; and (4) apply
-judgment where the model is a poor guide.
 
 \subsection{Data}
 
@@ -77,24 +66,22 @@ The model is a VAR with exogenous variables (VARX):
 \end{equation}
 where $y_t$ contains the five Canadian variables, $x_t$ contains oil-price growth and US GDP growth,
 and $d_t$ contains dummy variables for 2020Q2 and 2020Q3 that absorb the COVID-19 collapse and rebound.
-Treating oil and US GDP as exogenous reflects the small-open-economy assumption: Canadian conditions do
-not move world oil prices or US output within the quarter. It also makes scenario analysis direct,
-because a scenario is simply a chosen path for $x_t$.
+The choice of exogenous drivers is justified as Canada, as a small open economy, does not influence global oil prices or US growth. 
 
-The lag length is one quarter due to lack of observations. The model is estimated by OLS equation by equation using
+The lag length is one quarter because of limited observations. The model is estimated by OLS equation by equation using
 the R package \texttt{vars}.
 
 \subsection{Scenario forecasts and judgment}
 
 For each scenario, the oil and US GDP paths are fed into the estimated model and the Canadian variables
-are forecast nine quarters ahead, conditional on those paths. The 2026Q3 oil price is set to its actual
+are forecast nine quarters, conditional on those paths. The 2026Q3 oil price is set to its actual
 average (\$87.12) in every scenario. For every scenario, the policy rate was imposed to be greater than or equal to 0.25\%
 
 % -----------------------------------------------------------------------------
 \section{Scenarios and historical calibration}
 
-Each scenario's driver paths are sized against historical episodes in the same data (Table~\ref{tab:episodes}),
-so that magnitudes reflect what has actually happened rather than arbitrary choices.
+Each scenario's driver paths are calibrated to previous historical events to reflect real economic downturns (Table~\ref{tab:episodes})
+
 
 \begin{table}[htbp]
 \centering
@@ -133,8 +120,7 @@ Episode & WTI peak to trough & US growth & Canada GDP level & Canada unemp. \\
 \footnotesize Source: author's calculations from FRED and Statistics Canada data in the repository.
 \end{table}
 
-The downside is a plausible, moderate scenario rather than a severe stress. A severe scenario for
-stress-testing purposes would be calibrated to 2008--09: oil down roughly 60\% and a US contraction.
+In this exercise, due to the simplicity of the model, I calibrated the downside scenario to a moderate contraction, rather than a severe recession.
 
 % -----------------------------------------------------------------------------
 \section{Results}
@@ -165,48 +151,36 @@ Downside $-$ baseline & $-28.4$ & $-1.5$ & $-1.29$ & 0.47 & $-0.87$ & $-0.41$ & 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{scenarios.png}
-\caption{Canadian macro paths under the three scenarios. History since 2021 in grey.}
+\caption{Canadian macro paths under the three scenarios}
 \label{fig:paths}
 \end{figure}
 
-\textbf{Downside.} Canadian real GDP contracts for three consecutive quarters (2026Q4--2027Q2), with a
-trough of $-1.0\%$ annualized in 2027Q1, and the level falls about 0.4\% from its peak. This is a mild
+\textbf{Baseline.} The baseline scenario, which reflects market consensus paths for the key drivers, results in an initial decline in real GDP growth for Canada, followed by a rebound through 2027. CPI experiences a sharp decline as oil prices decrease, and then remains around target for the rest of the forecast, allowing flexibility for the central bank to cut rates through 2027. Unemployment ticks up past 7\%, and the housing price index goes up slightly.
+
+\textbf{Downside.} Canadian real GDP contracts for three consecutive quarters (2026Q4--2027Q2), with the lowest level reaching $-1.0\%$ annualized in 2027Q1. This is a mild
 technical recession, similar in severity to Canada's experience in 2001. Unemployment rises steadily to a
-peak of about 7.9\% in 2028Q2, 1.2 points above its 2026Q2 level of 6.7\%. Inflation dips below zero in
-2027Q1 as lower oil prices pass through, and the policy rate is cut to about 0.3\% by 2028Q3, close
-to its effective lower bound. New house prices decline through 2027.
+peak of about 7.9\% in 2028Q2, 1.2 points above its 2026Q2 level. Inflation goes below zero in
+2027Q1 as lower oil prices cool down the economy, and the policy rate is cut to about 0.3\% by 2028Q. New house prices decline through 2027.
 
 \textbf{Upside.} Stronger US demand lifts Canadian GDP growth by about 0.4 points relative to the baseline
-in 2027, and unemployment is slightly lower. Because the upside oil path declines more slowly than the
-baseline path, average 2027 oil prices are similar in both, so the upside works almost entirely through
-the US demand channel.
+in 2027, and unemployment is slightly lower. The policy rate remains slightly below 2026Q2 to support growth as inflation stays under control and housing prices rebound slightly.
 
-\textbf{Supply versus demand shocks.} During development, an alternative downside with oil rising to
-\$110 (a supply shock) and US growth of 1.5\% was also run. It \emph{raised} Canadian GDP growth relative
-to the baseline (by about 0.4 points in 2027) and pushed CPI inflation up by about 0.7 points, because
-Canada is a net oil exporter and higher prices improve its terms of trade. For Canada, the more damaging
-combination is a demand shock in which oil prices fall \emph{and} US growth weakens, which is why the
-final downside takes that form. History supports this: in 2014--16 oil collapsed while the US kept
-growing, and Canadian unemployment did not rise nationally, whereas in 2001 and 2008--09 US weakness
-was accompanied by rising Canadian unemployment.
 
 % -----------------------------------------------------------------------------
 \section{Limitations}
 
 \begin{itemize}
-  \item \textbf{Linearity.} The VAR captures average historical relationships. It likely understates
-        responses to large shocks; a 2008-sized shock would probably produce a milder outcome than the
-        $-4.4\%$ GDP decline Canada actually experienced.
+  \item \textbf{Linearity.} The VAR model may not capture non-linear relationships or extreme responses to severe scenarios. Further work could include the use of Machine Learning for better prediction.
   \item \textbf{Short sample and imprecise estimates.} The policy-rate series limits the sample to
-        68 quarters. In the GDP equation, only contemporaneous US growth is statistically significant
-        at the 5\% level; oil coefficients are positive but imprecise.
-  \item \textbf{Mean reversion.} Forecasts drift toward sample averages. Part of the rise in
-        unemployment in every scenario, including the baseline, reflects reversion toward the
-        2009--2026 average of about 7\%.
-  \item \textbf{Missing channels.} The exchange rate, Canadian fiscal policy, and feedback from Canada
-        to the world are not modelled. Forecast uncertainty bands are not reported.
-  \item \textbf{Judgment.} The policy-rate floor is imposed by hand, and scenario probabilities are not
-        assigned.
+        68 quarters. As a result, some of the estimates may not be statistically significant.
+  \item \textbf{Mean reversion.} With a relatively low number of observations, forecasting several quarters may produce estimates that drift toward the historical averages.
+  \item \textbf{Missing channels.} For simplicity, some macroeconomic variables were omitted, which may produce omitted variable bias. These variables could include the Canada-US exchange rate, the Fed decisions, Canadian and US yields, etc.
+  \item \textbf{Lack of structure} A structural VAR could be implemented to better simulate real-world conditions, where monetary and fiscal policy react to changes in macroeconomic variables at different times.
 \end{itemize}
+
+% -----------------------------------------------------------------------------
+\section{AI Disclaimer}
+
+AI was used in this project to assist with coding. Commentary is the Author's.
 
 \end{document}
