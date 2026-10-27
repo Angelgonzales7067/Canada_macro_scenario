@@ -29,9 +29,6 @@ Driver paths are calibrated to historical episodes in the same data.
 
 - **Downside:** GDP contracts for three quarters (2026Q4–2027Q2), unemployment peaks near 7.9% in
   2028, and the policy rate is cut to about 0.3% by 2028Q3.
-- **Supply vs. demand:** an alternative oil *supply* shock (WTI at $110) raised Canadian GDP, because
-  Canada is a net oil exporter. The damaging case for Canada is a *demand* shock: oil falls and US
-  growth weakens together.
 
 Growth rates are annualized quarter-over-quarter.
 
